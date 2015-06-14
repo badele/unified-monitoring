@@ -46,21 +46,23 @@ class net(object):
         """Get all informations and store in cache var"""
         # TCP, UDP, UNIX, etc ...
         for nettype in self.nettypes:
-            self.cache[nettype] = self.executeNetSection(nettype)
+            self.cache[nettype] = self.executeCmd4Nettype(nettype)
 
     def getAllValues(self):
         # TCP, UDP, UNIX, etc ...
         for nettype in self.nettypes:
             self.net_count(nettype)
             self.net_state(nettype)
-            if nettype != "unix":
-                self.net_distinct_remoteip(nettype)
+            self.net_distinct_remoteip(nettype)
 
     def net_count(self, nettype):
         """Get a net type [ TCP, UDP, UNIX, etc ...]  connexion count"""
         self.values['%(nettype)s.count' % locals()] = len(self.cache[nettype])
 
     def net_state(self, nettype):
+        if nettype == 'unix':
+            return
+
         groupestate = Counter()
         for line in self.cache[nettype]:
             groupestate[line[3]] += 1
@@ -71,6 +73,9 @@ class net(object):
             self.values[keyname][statename] = groupestate[key]
 
     def net_distinct_remoteip(self, nettype):
+        if nettype == 'unix':
+            return
+
         distinctip = Set()
         for line in self.cache[nettype]:
             remoteip = line[2].split(':')[0]
@@ -80,9 +85,9 @@ class net(object):
         self.values[keyname] = len(distinctip)
 
 
-    def executeNetSection(self, section):
+    def executeCmd4Nettype(self, nettype):
         result = []
-        cmdresult = executeCommand('cat /proc/net/%(section)s' % locals())
+        cmdresult = executeCommand('cat /proc/net/%(nettype)s' % locals())
 
         # Replace multiple space by one space (for split)
         cmdresult = re.sub(r' +', ' ', cmdresult)
@@ -90,14 +95,12 @@ class net(object):
 
         # Remove header and two end line
         lines.pop(0)
-        lines.pop(len(lines)-1)
-        if len(lines) > 1:
-            lines.pop(len(lines)-1)
+        while len(lines) > 0 and lines[len(lines) - 1] == '':
+            lines.pop(len(lines) - 1)
 
         # Get result columns
         for line in lines:
-            column = line.split(' ')
-            column.pop(0)
+            column = line.split()
             result.append(column)
 
         return result
