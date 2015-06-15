@@ -60,7 +60,9 @@ class net(object):
         """Get all informations and store in cache var"""
         # TCP, UDP, UNIX, etc ...
         for nettype in self.nettypes:
-            self.cache[nettype] = self.executeCmd4Nettype(nettype)
+            self.cache[nettype] = self.executeCmd4Nettype(nettype, True)
+
+        self.cache['socket'] = self.executeCmd4Nettype('sockstat')
 
     def getAllValues(self):
         """
@@ -72,6 +74,8 @@ class net(object):
             self.net_count(nettype)
             self.net_state(nettype)
             self.net_distinct_remoteip(nettype)
+
+        self.net_socket_state()
 
     def net_count(self, nettype):
         """
@@ -118,7 +122,23 @@ class net(object):
         self.values[keyname] = len(distinctip)
 
 
-    def executeCmd4Nettype(self, nettype):
+    def net_socket_state(self):
+        """
+        Get socket stats
+        :return:
+        """
+        for line in self.cache['socket']:
+            fieldname = 'socket.%s' % line[0][:-1].lower()
+            # Remove primary field
+            line.pop(0)
+
+            # Create the global fieldname
+            varname = line[0]
+            value = line[1]
+            fullfieldname = "%(fieldname)s.%(varname)s" % locals()
+            self.values[fullfieldname] = value
+
+    def executeCmd4Nettype(self, nettype, removeheader=False):
         """
         Execute a network command for networking
         ex: cat /proc/net/tcp
@@ -132,8 +152,10 @@ class net(object):
         cmdresult = re.sub(r' +', ' ', cmdresult)
         lines = cmdresult.split('\n')
 
-        # Remove header and two end line
-        lines.pop(0)
+        # Remove header and end line
+        if removeheader:
+            lines.pop(0)
+
         while len(lines) > 0 and lines[len(lines) - 1] == '':
             lines.pop(len(lines) - 1)
 
