@@ -13,30 +13,44 @@ import pprint
 from common import  executeCommand, hex2dec, totxt
 
 STATE = {
-        '01':'ESTABLISHED',
-        '02':'SYN_SENT',
-        '03':'SYN_RECV',
-        '04':'FIN_WAIT1',
-        '05':'FIN_WAIT2',
-        '06':'TIME_WAIT',
-        '07':'CLOSE',
-        '08':'CLOSE_WAIT',
-        '09':'LAST_ACK',
-        '0A':'LISTEN',
-        '0B':'CLOSING'
-        }
+    '01': 'ESTABLISHED',
+    '02': 'SYN_SENT',
+    '03': 'SYN_RECV',
+    '04': 'FIN_WAIT1',
+    '05': 'FIN_WAIT2',
+    '06': 'TIME_WAIT',
+    '07': 'CLOSE',
+    '08': 'CLOSE_WAIT',
+    '09': 'LAST_ACK',
+    '0A': 'LISTEN',
+    '0B': 'CLOSING'
+}
 
 def _ip(s):
+    """
+    Convert Hexadecimal IP to decimal IP address
+    :param s: Hexadecimal IP
+    :return: Decimal IP address
+    """
     ip = [(hex2dec(s[6:8])),(hex2dec(s[4:6])),(hex2dec(s[2:4])),(hex2dec(s[0:2]))]
     return '.'.join(ip)
 
 def _convert_ip_port(ip_port):
+    """
+    Convert Hexadecimal port to decimal port
+    :param ip_port: Hexadecimal Port
+    :return: Decimal port
+    """
     host,port = ip_port.split(':')
     return _ip(host),hex2dec(port)
 
 
 class net(object):
     def __init__(self):
+        """
+        Constructor
+        :return:
+        """
         self.cache = {}
         self.values = {}
         self.nettypes = ['tcp', 'udp', 'unix', 'raw']
@@ -49,6 +63,10 @@ class net(object):
             self.cache[nettype] = self.executeCmd4Nettype(nettype)
 
     def getAllValues(self):
+        """
+        Get all network informations
+        :return:
+        """
         # TCP, UDP, UNIX, etc ...
         for nettype in self.nettypes:
             self.net_count(nettype)
@@ -56,10 +74,20 @@ class net(object):
             self.net_distinct_remoteip(nettype)
 
     def net_count(self, nettype):
-        """Get a net type [ TCP, UDP, UNIX, etc ...]  connexion count"""
+        """
+        Get connexion count for nettype
+        :param nettype: nettype [ TCP, UDP, UNIX, etc ...]
+        :return:
+        """
+        """"""
         self.values['%(nettype)s.count' % locals()] = len(self.cache[nettype])
 
     def net_state(self, nettype):
+        """
+        Get a connexion state for nettype
+        :param nettype: nettype [ TCP, UDP, UNIX, etc ...]
+        :return:
+        """
         if nettype == 'unix':
             return
 
@@ -73,6 +101,11 @@ class net(object):
             self.values[keyname][statename] = groupestate[key]
 
     def net_distinct_remoteip(self, nettype):
+        """
+        Get a unique remote for nettype
+        :param nettype: nettype [ TCP, UDP, UNIX, etc ...]
+        :return:
+        """
         if nettype == 'unix':
             return
 
@@ -86,6 +119,12 @@ class net(object):
 
 
     def executeCmd4Nettype(self, nettype):
+        """
+        Execute a network command for networking
+        ex: cat /proc/net/tcp
+        :param nettype: nettype [ TCP, UDP, UNIX, etc ...]
+        :return: a cat /proc/net/xxx result
+        """
         result = []
         cmdresult = executeCommand('cat /proc/net/%(nettype)s' % locals())
 
