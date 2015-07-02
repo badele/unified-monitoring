@@ -84,7 +84,7 @@ class net(object):
         :return:
         """
         """"""
-        self.values['%(nettype)s.count' % locals()] = len(self.cache[nettype])
+        self.values['net.%(nettype)s.count' % locals()] = len(self.cache[nettype])
 
     def net_state(self, nettype):
         """
@@ -99,7 +99,7 @@ class net(object):
         for line in self.cache[nettype]:
             groupestate[line[3]] += 1
 
-        keyname = '%(nettype)s.state' % locals()
+        keyname = 'net.%(nettype)s.state' % locals()
         self.values[keyname] = {}
         for key, statename in STATE.iteritems():
             self.values[keyname][statename] = groupestate[key]
@@ -118,7 +118,7 @@ class net(object):
             remoteip = line[2].split(':')[0]
             distinctip.add(remoteip)
 
-        keyname = '%(nettype)s.remote.count' % locals()
+        keyname = 'net.%(nettype)s.remote.count' % locals()
         self.values[keyname] = len(distinctip)
 
 
@@ -135,7 +135,7 @@ class net(object):
             # Create the global fieldname
             varname = line[0]
             value = line[1]
-            fullfieldname = "%(fieldname)s.%(varname)s" % locals()
+            fullfieldname = "net.%(fieldname)s.%(varname)s" % locals()
             self.values[fullfieldname] = value
 
     def executeCmd4Nettype(self, nettype, removeheader=False):
