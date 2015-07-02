@@ -64,7 +64,7 @@ class haproxy(object):
             columns = result.split(":")
             if len(columns) == 2:
                 name, value = columns[0].lower(), columns[1]
-                keyname = 'info.%s' % name
+                keyname = 'haproxy.info.%s' % name
                 self.values[keyname] = value
 
     def getBackend(self):
@@ -90,7 +90,7 @@ class haproxy(object):
 
                 for searchkey in searchkeys:
                     idx = headkeynames.index(searchkey)
-                    keyname = 'service.%s.%s.%s' % (columns[0].lower(),columns[1].lower(), searchkey.lower())
+                    keyname = 'haproxy.%s.%s.%s' % (columns[0].lower(),columns[1].lower(), searchkey.lower())
                     value = columns[idx]
 
                     try:
@@ -110,7 +110,7 @@ class haproxy(object):
                     except:
                         states[searchkey] = "UNDEFINED"
 
-                keyname = 'service.%s.%s.states' % (columns[0].lower(),columns[1].lower())
+                keyname = 'haproxy.%s.%s.states' % (columns[0].lower(),columns[1].lower())
                 self.values[keyname] = states
 
 
