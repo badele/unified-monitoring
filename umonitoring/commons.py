@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import json
 import shlex
+
 import subprocess
 from subprocess import PIPE
+
 
 class TimeoutException(Exception):
 	pass
 
+NAGIOSSTATE = ['OK', 'WARNING', 'CRITICAL']
 
 def totxt(dictvalue):
 
@@ -38,3 +43,36 @@ def executeCommand(cmd):
         print('Failed running %s' % cmd)
         raise Exception(errors)
     return output.decode('utf-8')
+
+def loadFromCache(cachefile):
+    """
+    Load JSON content from file
+    :param cachefile:
+    :return:
+    """
+    if cachefile is None:
+        return None
+
+    if not os.path.exists(cachefile):
+        return None
+
+    lines = open(cachefile).read()
+    return json.loads(lines)
+
+def saveToCache(cachefile, jsoncontent):
+    """
+    Save JSON content to file
+    :param cachefile:
+    :param jsoncontent:
+    :return:
+    """
+    if cachefile is None:
+        return
+
+    with open(cachefile, 'w') as f:
+        jsontext = json.dumps(
+            jsoncontent, sort_keys=True,
+            indent=4, separators=(',', ': ')
+        )
+        f.write(jsontext)
+        f.close()

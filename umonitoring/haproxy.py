@@ -4,23 +4,28 @@
 import select
 import socket
 
-from common import  totxt
+import commons
 
 class TimeoutException(Exception):
 	pass
 
 class haproxy(object):
-    def __init__(self, socket=None):
+    def __init__(self, socket=None, cachefile=None):
         """
         Constructor
         :return:
         """
 
         if socket is None:
-            socket = '/tmp/haproxy'
+            socket = '/var/run/haproxy.socket'
+
+        if cachefile is None:
+            cachefile = '/tmp/haproxy.cache'
 
         self.socket = socket
+        self.cachefile = cachefile
         self.values = {}
+        self.oldvalues = {}
 
 
     def execute_socket_command(self,command, timeout=200):
@@ -74,6 +79,7 @@ class haproxy(object):
         """
         headkeynames = self.execute_socket_command("show stat")[0].split(',')
 
+        self.oldvalues = commons.loadFromCache(self.cachefile)
         lines =  self.execute_socket_command("show stat")[1:]
         for line in lines:
             columns = line.split(",")
@@ -98,6 +104,7 @@ class haproxy(object):
                     except:
                         self.values[keyname] = "UNDEFINED"
 
+
                 # Get state from frontend or backend
                 states = {}
                 errorskey = ['hrsp_1xx', 'hrsp_2xx', 'hrsp_3xx', 'hrsp_4xx', 'hrsp_5xx', 'hrsp_other']
@@ -112,6 +119,7 @@ class haproxy(object):
 
                 keyname = 'haproxy.%s.%s.states' % (columns[0].lower(),columns[1].lower())
                 self.values[keyname] = states
+                commons.saveToCache(self.cachefile, self.values)
 
 
     def getAllValues(self):
@@ -125,5 +133,5 @@ class haproxy(object):
 if __name__ == '__main__':
     monit = haproxy()
     monit.getAllValues()
-    print totxt(monit.values)
+    print commons.totxt(monit.values)
 
