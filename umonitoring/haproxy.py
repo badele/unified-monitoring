@@ -84,14 +84,15 @@ class haproxy(object):
         for line in lines:
             columns = line.split(",")
 
-            if len(columns) == 52:
+            if len(columns) == 63:
                 # frontend or backend informations
                 searchkeys = [
                     'qcur', 'qmax', 'scur', 'smax', 'slim', 'stot', 'bin', 'bout' ,'dreq', 'dresp',
                     'ereq', 'econ', 'eresp', 'wretr', 'wredis', 'status', 'weight' ,'act', 'bck', 'chkfail', 'chkdown',
                     'lastchg', 'downtime', 'qlimit', 'pid', 'iid','sid', 'throttle', 'lbtot', 'tracked', 'type', 'rate',
                     'rate_lim', 'rate_max', 'check_status', 'check_code', 'check_duration', 'hanafail','req_rate',
-                    'req_rate_max', 'req_tot', 'cli_abrt', 'srv_abrt'
+                    'req_rate_max', 'req_tot', 'cli_abrt', 'srv_abrt', 'comp_in', 'comp_out' ,'comp_byp', 'comp_rsp',
+                    'lastsess', 'last_chk', 'last_agt', 'qtime', 'ctime','rtime', 'ttime'
                 ]
 
                 for searchkey in searchkeys:
