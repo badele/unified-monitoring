@@ -28,7 +28,7 @@ class disk(object):
 
         for line in df_result[1:]:
             result = line.split()
-            keyname = 'df.%s' % result[5]
+            keyname = 'disk.df.%s' % result[5]
             self.values[keyname] = {}
             self.values[keyname]['filesystem'] = result[0]
             self.values[keyname]['totalsize'] = int(result[1]) * 1024
