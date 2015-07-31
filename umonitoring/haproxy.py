@@ -4,7 +4,7 @@
 import select
 import socket
 
-from umonitoring.commons import toTxt, toFlatDict
+from umonitoring.commons import toTxt, toFlatDict, loadFromCache, saveToCache
 
 class TimeoutException(Exception):
 	pass
@@ -35,12 +35,13 @@ class haproxy(object):
         :param timeout:
         :return:
         """
-        buffer = ""
+        buffer = b''
 
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client.connect(self.socket)
 
-        client.send(command + "\n")
+        command = command + "\n"
+        client.send(command.encode('utf8'))
 
         running = True
         while(running):
@@ -51,7 +52,7 @@ class haproxy(object):
 
             for s in r:
                 if (s is client):
-                    buffer = buffer + client.recv(16384)
+                    buffer += client.recv(16384)
                     running = (len(buffer)==0)
 
         client.close()
@@ -79,7 +80,7 @@ class haproxy(object):
         """
         headkeynames = self.execute_socket_command("show stat")[0].split(',')
 
-        self.oldvalues = commons.loadFromCache(self.cachefile)
+        self.oldvalues = loadFromCache(self.cachefile)
         lines =  self.execute_socket_command("show stat")[1:]
         for line in lines:
             columns = line.split(",")
@@ -107,7 +108,7 @@ class haproxy(object):
                         self.values[keyname] = "UNDEFINED"
 
 
-                commons.saveToCache(self.cachefile, self.values)
+                saveToCache(self.cachefile, self.values)
 
 
     def getAllValues(self):
