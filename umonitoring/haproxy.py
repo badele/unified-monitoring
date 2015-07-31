@@ -4,7 +4,7 @@
 import select
 import socket
 
-import commons
+from umonitoring.commons import toTxt, toFlatDict
 
 class TimeoutException(Exception):
 	pass
@@ -135,5 +135,5 @@ class haproxy(object):
 if __name__ == '__main__':
     monit = haproxy()
     monit.getAllValues()
-    print (commons.totxt(monit.values))
+    print(toTxt(toFlatDict(monit.values)))
 
