@@ -4,26 +4,22 @@
 # Inspired by http://voorloopnul.com/blog/a-python-netstat-in-less-than-100-lines-of-code/
 
 import re
-import net
 from collections import Counter
-from sets import Set
-import pprint
 
-
-from common import  executeCommand, hex2dec, totxt
+from umonitoring.commons import  executeCommand, hex2dec, toTxt, toFlatDict
 
 STATE = {
-    '01': 'ESTABLISHED',
-    '02': 'SYN_SENT',
-    '03': 'SYN_RECV',
-    '04': 'FIN_WAIT1',
-    '05': 'FIN_WAIT2',
-    '06': 'TIME_WAIT',
-    '07': 'CLOSE',
-    '08': 'CLOSE_WAIT',
-    '09': 'LAST_ACK',
-    '0A': 'LISTEN',
-    '0B': 'CLOSING'
+    '01': 'established',
+    '02': 'syn_sent',
+    '03': 'syn_recv',
+    '04': 'fin_wait1',
+    '05': 'fin_wait2',
+    '06': 'time_wait',
+    '07': 'close',
+    '08': 'close_wait',
+    '09': 'last_ack',
+    '0a': 'listen',
+    '0b': 'closing'
 }
 
 def _ip(s):
@@ -101,7 +97,7 @@ class net(object):
 
         keyname = 'net.%(nettype)s.state' % locals()
         self.values[keyname] = {}
-        for key, statename in STATE.iteritems():
+        for key, statename in STATE.items():
             self.values[keyname][statename] = groupestate[key]
 
     def net_distinct_remoteip(self, nettype):
@@ -113,7 +109,7 @@ class net(object):
         if nettype == 'unix':
             return
 
-        distinctip = Set()
+        distinctip = set()
         for line in self.cache[nettype]:
             remoteip = line[2].split(':')[0]
             distinctip.add(remoteip)
@@ -170,4 +166,4 @@ class net(object):
 if __name__ == '__main__':
     monit = net()
     monit.getAllValues()
-    print totxt(monit.values)
+    print(toTxt(toFlatDict(monit.values)))
