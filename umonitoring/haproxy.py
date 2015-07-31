@@ -107,20 +107,6 @@ class haproxy(object):
                         self.values[keyname] = "UNDEFINED"
 
 
-                # # Get state from frontend or backend
-                # states = {}
-                # errorskey = ['hrsp_1xx', 'hrsp_2xx', 'hrsp_3xx', 'hrsp_4xx', 'hrsp_5xx', 'hrsp_other']
-                # for searchkey in errorskey:
-                #     idx = headkeynames.index(searchkey)
-                #     value = columns[idx]
-                #
-                #     try:
-                #         states[searchkey] = int(value)
-                #     except:
-                #         states[searchkey] = "UNDEFINED"
-                #
-                # keyname = 'haproxy.%s.%s.states' % (columns[0].lower(),columns[1].lower())
-                # self.values[keyname] = states
                 commons.saveToCache(self.cachefile, self.values)
 
 
