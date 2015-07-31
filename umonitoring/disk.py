@@ -24,17 +24,17 @@ class disk(object):
         self.get_df()
 
     def get_df(self):
-        df_result = os.popen('/bin/df -k -l -P ').read().splitlines()
+        cmd_result = os.popen('/bin/df -k -l -P ').read().splitlines()
 
-        for line in df_result[1:]:
-            result = line.split()
-            keyname = 'disk.df.%s' % result[5]
+        for line in cmd_result[1:]:
+            columns = line.split()
+            keyname = 'disk.df.%s' % columns[5]
             self.values[keyname] = {}
-            self.values[keyname]['filesystem'] = result[0]
-            self.values[keyname]['totalsize'] = int(result[1]) * 1024
-            self.values[keyname]['usersize'] = int(result[2]) * 1024
-            self.values[keyname]['freesize'] = int(result[3]) * 1024
-            self.values[keyname]['mountedpoint'] = result[5]
+            self.values[keyname]['filesystem'] = columns[0]
+            self.values[keyname]['totalsize'] = int(columns[1]) * 1024
+            self.values[keyname]['usersize'] = int(columns[2]) * 1024
+            self.values[keyname]['freesize'] = int(columns[3]) * 1024
+            self.values[keyname]['mountedpoint'] = columns[5]
             self.values[keyname]['freepercent'] = self.values[keyname]['freesize'] / self.values[keyname]['totalsize'] * 100
             self.values[keyname]['usedpercent'] = self.values[keyname]['usersize'] / self.values[keyname]['totalsize'] * 100
 
