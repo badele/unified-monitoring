@@ -10,12 +10,43 @@ from subprocess import PIPE
 
 
 class TimeoutException(Exception):
-	pass
+    pass
+
 
 NAGIOSSTATE = ['OK', 'WARNING', 'CRITICAL']
 
-def totxt(dictvalue):
 
+def toFlatDict(dictvalue):
+    """
+    Convert Tow level dict array in flat dict array
+    :param dictvalue:
+    :return:
+    """
+
+    keys = dictvalue.keys()
+    todelete = []
+    toadd = {}
+
+    # Flat the dict array
+    for key in keys:
+        if isinstance(dictvalue[key],dict):
+            subkeys = dictvalue[key]
+            for subkey in subkeys:
+                fullsubkey = '%(key)s.%(subkey)s' % locals()
+                toadd[fullsubkey] = subkeys[subkey]
+            todelete.append(key)
+
+    # Add new key
+    for key in toadd:
+        dictvalue[key] = toadd[key]
+
+    # Delete unused keys
+    for key in todelete:
+        del dictvalue[key]
+
+    return dictvalue
+
+def toTxt(dictvalue):
     result = ''
     keys = dictvalue.keys()
 
@@ -33,7 +64,8 @@ def totxt(dictvalue):
 
 
 def hex2dec(s):
-    return str(int(s,16))
+    return str(int(s, 16))
+
 
 def executeCommand(cmd):
     cmdargs = shlex.split(cmd)
@@ -43,6 +75,7 @@ def executeCommand(cmd):
         print('Failed running %s' % cmd)
         raise Exception(errors)
     return output.decode('utf-8')
+
 
 def loadFromCache(cachefile):
     """
@@ -58,6 +91,7 @@ def loadFromCache(cachefile):
 
     lines = open(cachefile).read()
     return json.loads(lines)
+
 
 def saveToCache(cachefile, jsoncontent):
     """
