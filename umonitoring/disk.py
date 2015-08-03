@@ -32,11 +32,11 @@ class disk(object):
             self.values[keyname] = {}
             self.values[keyname]['filesystem'] = columns[0]
             self.values[keyname]['totalsize'] = int(columns[1]) * 1024
-            self.values[keyname]['usersize'] = int(columns[2]) * 1024
+            self.values[keyname]['usedsize'] = int(columns[2]) * 1024
             self.values[keyname]['freesize'] = int(columns[3]) * 1024
             self.values[keyname]['mountedpoint'] = columns[5]
-            self.values[keyname]['freepercent'] = self.values[keyname]['freesize'] / self.values[keyname]['totalsize'] * 100
-            self.values[keyname]['usedpercent'] = self.values[keyname]['usersize'] / self.values[keyname]['totalsize'] * 100
+            self.values[keyname]['freepercent'] = self.values[keyname]['freesize'] / float(self.values[keyname]['totalsize']) * 100
+            self.values[keyname]['usedpercent'] = self.values[keyname]['usedsize'] / float(self.values[keyname]['totalsize']) * 100
 
 if __name__ == '__main__':
     monit = disk()
